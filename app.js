@@ -2,7 +2,7 @@
 const CONFIG = {
     chavePix: '11049570000192',
     beneficiario: 'Madmras Ferragens Ltda',
-    cidade: 'SAO PAULO'
+    cidade: 'ESTANCIA VELHA'
 };
 
 // Elementos do DOM - Telas
