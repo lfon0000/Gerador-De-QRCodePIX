@@ -46,6 +46,9 @@ btnCopiar.addEventListener('click', copiarCodigo);
 btnCompartilhar.addEventListener('click', compartilharWhatsApp);
 
 function gerarPix() {
+    // Esconder teclado
+    valorInput.blur();
+
     const valorStr = valorInput.value.replace(',', '.');
     const valor = parseFloat(valorStr);
 
@@ -198,11 +201,13 @@ async function compartilharWhatsApp() {
     const codigo = document.getElementById('codigo-pix').value;
     const valor = valorDisplay.textContent;
 
-    const mensagem = `*PIX - Madmras Ferragens*\n\n` +
-        `Valor: ${valor}\n` +
-        `Beneficiario: ${CONFIG.beneficiario}\n\n` +
+    const mensagem = `*MADMRAS FERRAGENS*\n` +
+        `*Pagamento via PIX*\n\n` +
+        `Valor: *${valor}*\n\n` +
+        `Escaneie o QR Code acima ou copie o codigo abaixo e cole no aplicativo do seu banco:\n\n` +
         `*Codigo Copia e Cola:*\n${codigo}\n\n` +
-        `_Cole o codigo acima no seu app de pagamento PIX_`;
+        `Agradecemos a preferencia!\n` +
+        `_Madmras Ferragens - No seu sonho, no seu lar!_`;
 
     // Tentar compartilhar com imagem usando Web Share API
     if (navigator.share && navigator.canShare) {
@@ -222,6 +227,7 @@ async function compartilharWhatsApp() {
 
             if (navigator.canShare(shareData)) {
                 await navigator.share(shareData);
+                voltarTelaInicial();
                 return;
             }
         } catch (err) {
@@ -232,6 +238,18 @@ async function compartilharWhatsApp() {
     // Fallback: abrir WhatsApp com mensagem (sem imagem)
     const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
     window.open(urlWhatsApp, '_blank');
+    voltarTelaInicial();
+}
+
+function voltarTelaInicial() {
+    // Limpar valor
+    valorInput.value = '';
+
+    // Esconder QR Code
+    qrcodeContainer.classList.add('hidden');
+
+    // Scroll para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function mostrarToast(mensagem) {
