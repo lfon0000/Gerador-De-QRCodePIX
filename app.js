@@ -238,19 +238,14 @@ btnEnviarImagem.addEventListener('click', async () => {
     mostrarToast('Compartilhamento nao disponivel');
 });
 
-// Botao 2: Enviar codigo copia e cola
+// Botao 2: Enviar codigo copia e cola (apenas o codigo)
 btnEnviarCodigo.addEventListener('click', async () => {
     const codigo = document.getElementById('codigo-pix').value;
-    const valor = valorDisplay.textContent;
-
-    const mensagem = `*PIX - Madmras Ferragens*\n\n` +
-        `Valor: *${valor}*\n\n` +
-        `*Codigo Copia e Cola:*\n${codigo}`;
 
     if (navigator.share) {
         try {
             await navigator.share({
-                text: mensagem
+                text: codigo
             });
             return;
         } catch (err) {
@@ -259,13 +254,12 @@ btnEnviarCodigo.addEventListener('click', async () => {
     }
 
     // Fallback WhatsApp
-    const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(codigo)}`;
     window.open(urlWhatsApp, '_blank');
 });
 
-// Botao 3: Enviar instrucoes de pagamento
+// Botao 3: Enviar instrucoes de pagamento (sem codigo)
 btnEnviarInstrucoes.addEventListener('click', async () => {
-    const codigo = document.getElementById('codigo-pix').value;
     const valor = valorDisplay.textContent;
 
     const mensagem = `*MADMRAS FERRAGENS*\n` +
@@ -275,7 +269,6 @@ btnEnviarInstrucoes.addEventListener('click', async () => {
         `1. Abra o app do seu banco\n` +
         `2. Escolha pagar com PIX\n` +
         `3. Escaneie o QR Code ou use o codigo copia e cola\n\n` +
-        `*Codigo Copia e Cola:*\n${codigo}\n\n` +
         `Agradecemos a preferencia!\n` +
         `_Madmras Ferragens - No seu sonho, no seu lar!_`;
 

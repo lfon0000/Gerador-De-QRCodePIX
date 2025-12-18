@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pix-madmras-v4';
+const CACHE_NAME = 'pix-madmras-v5';
 const urlsToCache = [
     './',
     './index.html',

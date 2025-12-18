@@ -23,12 +23,14 @@ body {
     color: var(--text-color);
     min-height: 100vh;
     line-height: 1.5;
+    overflow-x: hidden;
 }
 
 .container {
     max-width: 480px;
     margin: 0 auto;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* Sistema de Telas */
@@ -37,6 +39,9 @@ body {
     min-height: 100vh;
     padding: 16px;
     flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .tela.active {
@@ -219,6 +224,8 @@ footer {
     border-radius: 12px;
     padding: 4px;
     transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .input-wrapper:focus-within {
@@ -230,16 +237,19 @@ footer {
     font-weight: 600;
     color: var(--text-light);
     padding: 0 12px;
+    flex-shrink: 0;
 }
 
 .input-group input {
     flex: 1;
+    min-width: 0;
     padding: 16px 12px;
     font-size: 2rem;
     border: none;
     background: transparent;
     font-weight: 700;
     color: var(--text-color);
+    width: 100%;
 }
 
 .input-group input:focus {
