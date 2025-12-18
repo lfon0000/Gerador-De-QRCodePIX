@@ -88,6 +88,13 @@ valorInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Scroll para manter input visivel quando teclado abre
+valorInput.addEventListener('focus', () => {
+    setTimeout(() => {
+        valorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+});
+
 // ==================== GERACAO DO PIX ====================
 
 btnGerar.addEventListener('click', gerarPix);
