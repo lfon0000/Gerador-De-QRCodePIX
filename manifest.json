@@ -1,0 +1,21 @@
+{
+    "name": "PIX Madmras Ferragens",
+    "short_name": "PIX Madmras",
+    "description": "Gerador de QR Code PIX - Madmras Ferragens",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#d32f2f",
+    "theme_color": "#d32f2f",
+    "orientation": "portrait",
+    "scope": "./",
+    "icons": [
+        {
+            "src": "logo-madmraz5.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["business", "finance", "utilities"],
+    "lang": "pt-BR"
+}

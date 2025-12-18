@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:unpkg.com)",
+      "WebSearch",
+      "WebFetch(domain:cdnjs.cloudflare.com)",
+      "Bash(curl:*)"
+    ]
+  }
+}
