@@ -5,16 +5,31 @@ const CONFIG = {
     cidade: 'SAO PAULO'
 };
 
-// Elementos do DOM
+// Elementos do DOM - Telas
+const telaInicial = document.getElementById('tela-inicial');
+const telaValor = document.getElementById('tela-valor');
+const telaResultado = document.getElementById('tela-resultado');
+
+// Elementos do DOM - Botoes navegacao
+const btnNovaVenda = document.getElementById('btn-nova-venda');
+const btnVoltarInicial = document.getElementById('btn-voltar-inicial');
+const btnNovaVendaResultado = document.getElementById('btn-nova-venda-resultado');
+const btnVoltarInicio = document.getElementById('btn-voltar-inicio');
+
+// Elementos do DOM - Funcionalidade
 const valorInput = document.getElementById('valor');
 const btnGerar = document.getElementById('btn-gerar');
-const qrcodeContainer = document.getElementById('qrcode-container');
 const qrcodeCanvas = document.getElementById('qrcode-canvas');
 const valorDisplay = document.getElementById('valor-display');
 const codigoPix = document.getElementById('codigo-pix');
 const btnCopiar = document.getElementById('btn-copiar');
-const btnCompartilhar = document.getElementById('btn-compartilhar');
+const btnEnviarImagem = document.getElementById('btn-enviar-imagem');
+const btnEnviarCodigo = document.getElementById('btn-enviar-codigo');
+const btnEnviarInstrucoes = document.getElementById('btn-enviar-instrucoes');
 const toast = document.getElementById('toast');
+
+// Variavel para armazenar o valor atual
+let valorAtual = 0;
 
 // Registrar Service Worker
 if ('serviceWorker' in navigator) {
@@ -25,7 +40,38 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Formatacao de valor monetario no input
+// ==================== NAVEGACAO ====================
+
+function mostrarTela(tela) {
+    telaInicial.classList.remove('active');
+    telaValor.classList.remove('active');
+    telaResultado.classList.remove('active');
+    tela.classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+btnNovaVenda.addEventListener('click', () => {
+    valorInput.value = '';
+    mostrarTela(telaValor);
+    setTimeout(() => valorInput.focus(), 100);
+});
+
+btnVoltarInicial.addEventListener('click', () => {
+    mostrarTela(telaInicial);
+});
+
+btnNovaVendaResultado.addEventListener('click', () => {
+    valorInput.value = '';
+    mostrarTela(telaValor);
+    setTimeout(() => valorInput.focus(), 100);
+});
+
+btnVoltarInicio.addEventListener('click', () => {
+    mostrarTela(telaInicial);
+});
+
+// ==================== INPUT DE VALOR ====================
+
 valorInput.addEventListener('input', (e) => {
     let value = e.target.value.replace(/\D/g, '');
     if (value.length === 0) {
@@ -36,17 +82,17 @@ valorInput.addEventListener('input', (e) => {
     e.target.value = value.replace('.', ',');
 });
 
-// Gerar PIX ao clicar no botao
+valorInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        gerarPix();
+    }
+});
+
+// ==================== GERACAO DO PIX ====================
+
 btnGerar.addEventListener('click', gerarPix);
 
-// Copiar codigo
-btnCopiar.addEventListener('click', copiarCodigo);
-
-// Compartilhar via WhatsApp
-btnCompartilhar.addEventListener('click', compartilharWhatsApp);
-
 function gerarPix() {
-    // Esconder teclado
     valorInput.blur();
 
     const valorStr = valorInput.value.replace(',', '.');
@@ -57,11 +103,11 @@ function gerarPix() {
         return;
     }
 
+    valorAtual = valor;
     const codigoPIX = gerarCodigoPix(valor);
 
-    // Gerar QR Code
     QRCode.toCanvas(qrcodeCanvas, codigoPIX, {
-        width: 280,
+        width: 250,
         margin: 2,
         color: {
             dark: '#000000',
@@ -74,70 +120,40 @@ function gerarPix() {
             return;
         }
 
-        // Mostrar container
-        qrcodeContainer.classList.remove('hidden');
-
-        // Atualizar valor exibido
         valorDisplay.textContent = formatarMoeda(valor);
-
-        // Atualizar codigo copia e cola
         document.getElementById('codigo-pix').value = codigoPIX;
-
-        // Scroll para o QR Code
-        qrcodeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        mostrarTela(telaResultado);
     });
 }
 
 function gerarCodigoPix(valor) {
-    // Formatar valor com 2 casas decimais
     const valorFormatado = valor.toFixed(2);
-
-    // Campos do PIX (padrao EMV)
     let payload = '';
 
-    // 00 - Payload Format Indicator
     payload += montarCampo('00', '01');
-
-    // 01 - Point of Initiation Method (12 = dinamico)
     payload += montarCampo('01', '12');
 
-    // 26 - Merchant Account Information (PIX)
     let merchantAccount = '';
-    // GUI do PIX
     merchantAccount += montarCampo('00', 'br.gov.bcb.pix');
-    // Chave PIX (CNPJ)
     merchantAccount += montarCampo('01', CONFIG.chavePix);
     payload += montarCampo('26', merchantAccount);
 
-    // 52 - Merchant Category Code (0000 = nao informado)
     payload += montarCampo('52', '0000');
-
-    // 53 - Transaction Currency (986 = BRL)
     payload += montarCampo('53', '986');
-
-    // 54 - Transaction Amount
     payload += montarCampo('54', valorFormatado);
-
-    // 58 - Country Code
     payload += montarCampo('58', 'BR');
 
-    // 59 - Merchant Name (max 25 caracteres)
     const nome = removerAcentos(CONFIG.beneficiario).substring(0, 25);
     payload += montarCampo('59', nome);
 
-    // 60 - Merchant City (max 15 caracteres)
     const cidade = removerAcentos(CONFIG.cidade).substring(0, 15);
     payload += montarCampo('60', cidade);
 
-    // 62 - Additional Data Field (TXID)
     let additionalData = '';
     additionalData += montarCampo('05', '***');
     payload += montarCampo('62', additionalData);
 
-    // 63 - CRC16 (placeholder para calculo)
     payload += '6304';
-
-    // Calcular CRC16
     const crc = calcularCRC16(payload);
     payload += crc;
 
@@ -150,7 +166,6 @@ function montarCampo(id, valor) {
 }
 
 function calcularCRC16(payload) {
-    // CRC16-CCITT-FALSE
     const polinomio = 0x1021;
     let resultado = 0xFFFF;
 
@@ -183,74 +198,104 @@ function formatarMoeda(valor) {
     });
 }
 
-async function copiarCodigo() {
+// ==================== COPIAR CODIGO ====================
+
+btnCopiar.addEventListener('click', async () => {
     const codigo = document.getElementById('codigo-pix').value;
 
     try {
         await navigator.clipboard.writeText(codigo);
         mostrarToast('Codigo copiado!');
     } catch (err) {
-        // Fallback para navegadores mais antigos
         document.getElementById('codigo-pix').select();
         document.execCommand('copy');
         mostrarToast('Codigo copiado!');
     }
-}
+});
 
-async function compartilharWhatsApp() {
+// ==================== COMPARTILHAMENTO ====================
+
+// Botao 1: Enviar imagem do QR Code
+btnEnviarImagem.addEventListener('click', async () => {
+    if (navigator.share && navigator.canShare) {
+        try {
+            const blob = await new Promise(resolve => {
+                qrcodeCanvas.toBlob(resolve, 'image/png');
+            });
+
+            const file = new File([blob], 'qrcode-pix-madmras.png', { type: 'image/png' });
+            const shareData = { files: [file] };
+
+            if (navigator.canShare(shareData)) {
+                await navigator.share(shareData);
+                return;
+            }
+        } catch (err) {
+            console.log('Erro ao compartilhar imagem:', err);
+        }
+    }
+
+    mostrarToast('Compartilhamento nao disponivel');
+});
+
+// Botao 2: Enviar codigo copia e cola
+btnEnviarCodigo.addEventListener('click', async () => {
+    const codigo = document.getElementById('codigo-pix').value;
+    const valor = valorDisplay.textContent;
+
+    const mensagem = `*PIX - Madmras Ferragens*\n\n` +
+        `Valor: *${valor}*\n\n` +
+        `*Codigo Copia e Cola:*\n${codigo}`;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                text: mensagem
+            });
+            return;
+        } catch (err) {
+            console.log('Erro ao compartilhar:', err);
+        }
+    }
+
+    // Fallback WhatsApp
+    const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    window.open(urlWhatsApp, '_blank');
+});
+
+// Botao 3: Enviar instrucoes de pagamento
+btnEnviarInstrucoes.addEventListener('click', async () => {
     const codigo = document.getElementById('codigo-pix').value;
     const valor = valorDisplay.textContent;
 
     const mensagem = `*MADMRAS FERRAGENS*\n` +
         `*Pagamento via PIX*\n\n` +
         `Valor: *${valor}*\n\n` +
-        `Escaneie o QR Code acima ou copie o codigo abaixo e cole no aplicativo do seu banco:\n\n` +
+        `Para pagar:\n` +
+        `1. Abra o app do seu banco\n` +
+        `2. Escolha pagar com PIX\n` +
+        `3. Escaneie o QR Code ou use o codigo copia e cola\n\n` +
         `*Codigo Copia e Cola:*\n${codigo}\n\n` +
         `Agradecemos a preferencia!\n` +
         `_Madmras Ferragens - No seu sonho, no seu lar!_`;
 
-    // Tentar compartilhar com imagem usando Web Share API
-    if (navigator.share && navigator.canShare) {
+    if (navigator.share) {
         try {
-            // Converter canvas para blob
-            const blob = await new Promise(resolve => {
-                qrcodeCanvas.toBlob(resolve, 'image/png');
+            await navigator.share({
+                text: mensagem
             });
-
-            const file = new File([blob], 'pix-madmras.png', { type: 'image/png' });
-
-            const shareData = {
-                title: 'PIX - Madmras Ferragens',
-                text: mensagem,
-                files: [file]
-            };
-
-            if (navigator.canShare(shareData)) {
-                await navigator.share(shareData);
-                voltarTelaInicial();
-                return;
-            }
+            return;
         } catch (err) {
-            console.log('Erro ao compartilhar com imagem:', err);
+            console.log('Erro ao compartilhar:', err);
         }
     }
 
-    // Fallback: abrir WhatsApp com mensagem (sem imagem)
+    // Fallback WhatsApp
     const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
     window.open(urlWhatsApp, '_blank');
-    voltarTelaInicial();
-}
+});
 
-function voltarTelaInicial() {
-    // Limpar valor
-    valorInput.value = '';
-
-    // Esconder QR Code
-    qrcodeContainer.classList.add('hidden');
-
-    // Scroll para o topo
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+// ==================== UTILIDADES ====================
 
 function mostrarToast(mensagem) {
     toast.textContent = mensagem;
@@ -260,10 +305,3 @@ function mostrarToast(mensagem) {
         toast.classList.add('hidden');
     }, 2500);
 }
-
-// Permitir Enter para gerar
-valorInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        gerarPix();
-    }
-});

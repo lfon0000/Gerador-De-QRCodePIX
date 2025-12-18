@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#d32f2f">
+    <meta name="theme-color" content="#c62828">
     <meta name="description" content="Gerador de QR Code PIX - Madmras Ferragens">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,49 +16,106 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <img src="logo-madmraz5.png" alt="Madmras Ferragens" class="logo">
-            <h1>Pagamento PIX</h1>
-        </header>
+        <!-- TELA 1: Inicial -->
+        <div id="tela-inicial" class="tela active">
+            <header>
+                <img src="logo-madmraz5.png" alt="Madmras Ferragens" class="logo">
+                <h1>Pagamento PIX</h1>
+                <p class="slogan">No seu sonho, no seu lar!</p>
+            </header>
 
-        <main>
-            <div class="info-box">
-                <p class="beneficiario"><strong>Beneficiario:</strong> Madmras Ferragens Ltda</p>
-                <p class="chave"><strong>Chave PIX (CNPJ):</strong> 11049570000192</p>
-            </div>
+            <main class="tela-inicial-content">
+                <div class="info-box">
+                    <p><strong>Beneficiario:</strong></p>
+                    <p class="beneficiario-nome">Madmras Ferragens Ltda</p>
+                    <p class="chave"><strong>CNPJ:</strong> 11.049.570/0001-92</p>
+                </div>
 
-            <div class="input-group">
-                <label for="valor">Valor a receber (R$):</label>
-                <input type="text" id="valor" inputmode="decimal" placeholder="0,00" autocomplete="off">
-            </div>
+                <button id="btn-nova-venda" class="btn btn-primary btn-grande">
+                    Nova Venda
+                </button>
+            </main>
 
-            <button id="btn-gerar" class="btn btn-primary">
-                Gerar QR Code PIX
-            </button>
+            <footer>
+                <p>Madmras Ferragens</p>
+            </footer>
+        </div>
 
-            <div id="qrcode-container" class="qrcode-container hidden">
+        <!-- TELA 2: Valor -->
+        <div id="tela-valor" class="tela">
+            <header class="header-compact">
+                <img src="logo-madmraz5.png" alt="Madmras Ferragens" class="logo-small">
+                <h2>Nova Venda</h2>
+            </header>
+
+            <main class="tela-valor-content">
+                <div class="input-group">
+                    <label for="valor">Valor a receber:</label>
+                    <div class="input-wrapper">
+                        <span class="currency">R$</span>
+                        <input type="text" id="valor" inputmode="decimal" placeholder="0,00" autocomplete="off">
+                    </div>
+                </div>
+
+                <button id="btn-gerar" class="btn btn-primary">
+                    Gerar QR Code PIX
+                </button>
+
+                <button id="btn-voltar-inicial" class="btn btn-secondary">
+                    Voltar
+                </button>
+            </main>
+        </div>
+
+        <!-- TELA 3: Resultado -->
+        <div id="tela-resultado" class="tela">
+            <header class="header-compact">
+                <img src="logo-madmraz5.png" alt="Madmras Ferragens" class="logo-small">
+                <h2>PIX Gerado</h2>
+            </header>
+
+            <main class="tela-resultado-content">
+                <div class="valor-destaque">
+                    <span id="valor-display">R$ 0,00</span>
+                </div>
+
                 <div id="qrcode-wrapper">
                     <canvas id="qrcode-canvas"></canvas>
                 </div>
-                <p class="valor-display">Valor: <span id="valor-display">R$ 0,00</span></p>
 
                 <div class="codigo-container">
                     <label>Codigo Copia e Cola:</label>
                     <textarea id="codigo-pix" readonly></textarea>
-                    <button id="btn-copiar" class="btn btn-secondary">
+                    <button id="btn-copiar" class="btn btn-copiar">
                         Copiar Codigo
                     </button>
                 </div>
 
-                <button id="btn-compartilhar" class="btn btn-whatsapp">
-                    Compartilhar via WhatsApp
-                </button>
-            </div>
-        </main>
+                <div class="botoes-compartilhar">
+                    <p class="instrucao-compartilhar">Enviar para o cliente:</p>
 
-        <footer>
-            <p>Madmras Ferragens - No seu sonho, no seu lar!</p>
-        </footer>
+                    <button id="btn-enviar-imagem" class="btn btn-whatsapp">
+                        Enviar Imagem do QR Code
+                    </button>
+
+                    <button id="btn-enviar-codigo" class="btn btn-whatsapp">
+                        Enviar Codigo Copia e Cola
+                    </button>
+
+                    <button id="btn-enviar-instrucoes" class="btn btn-whatsapp">
+                        Enviar Instrucoes de Pagamento
+                    </button>
+                </div>
+
+                <button id="btn-nova-venda-resultado" class="btn btn-primary">
+                    Nova Venda
+                </button>
+
+                <button id="btn-voltar-inicio" class="btn btn-secondary">
+                    Voltar ao Inicio
+                </button>
+            </main>
+        </div>
     </div>
 
     <div id="toast" class="toast hidden">Codigo copiado!</div>
