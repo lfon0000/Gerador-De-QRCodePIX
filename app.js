@@ -31,6 +31,14 @@ const toast = document.getElementById('toast');
 // Variavel para armazenar o valor atual
 let valorAtual = 0;
 
+// Carregar logo para usar no QR Code
+const logoImg = new Image();
+logoImg.src = 'logo-madmraz5.png';
+let logoCarregado = false;
+logoImg.onload = () => {
+    logoCarregado = true;
+};
+
 // Registrar Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -113,11 +121,13 @@ function gerarPix() {
     valorAtual = valor;
     const codigoPIX = gerarCodigoPix(valor);
 
+    // Usar nivel de correcao alto (H = 30%) para permitir logo no centro
     QRCode.toCanvas(qrcodeCanvas, codigoPIX, {
-        width: 250,
+        width: 280,
         margin: 2,
+        errorCorrectionLevel: 'H',
         color: {
-            dark: '#000000',
+            dark: '#c62828',
             light: '#ffffff'
         }
     }, (error) => {
@@ -125,6 +135,26 @@ function gerarPix() {
             console.error(error);
             mostrarToast('Erro ao gerar QR Code');
             return;
+        }
+
+        // Adicionar logo no centro do QR Code
+        if (logoCarregado) {
+            const ctx = qrcodeCanvas.getContext('2d');
+            const canvasSize = qrcodeCanvas.width;
+            const logoSize = canvasSize * 0.22;
+            const logoX = (canvasSize - logoSize) / 2;
+            const logoY = (canvasSize - logoSize) / 2;
+
+            // Fundo branco arredondado para o logo
+            const padding = 8;
+            const radius = 12;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(logoX - padding, logoY - padding, logoSize + padding * 2, logoSize + padding * 2, radius);
+            ctx.fill();
+
+            // Desenhar logo
+            ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
         }
 
         valorDisplay.textContent = formatarMoeda(valor);
